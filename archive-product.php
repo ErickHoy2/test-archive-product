@@ -10,9 +10,9 @@
  * happen. When this occurs the version of the template file will be bumped and
  * the readme will list any important changes.
  *
- * @see https://docs.woocommerce.com/document/template-structure/
- * @package WooCommerce/Templates
- * @version 3.4.0
+ * @see https://woocommerce.com/document/template-structure/
+ * @package WooCommerce\Templates
+ * @version 8.6.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -24,56 +24,19 @@ get_header( 'shop' );
  *
  * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs for the content)
  * @hooked woocommerce_breadcrumb - 20
+ * @hooked WC_Structured_Data::generate_website_data() - 30
  */
 do_action( 'woocommerce_before_main_content' );
 
-?>
-	<?php if ( apply_filters( 'woocommerce_show_page_title', true ) ) : ?>
-		<h1 class="woocommerce-products-header__title page-title">
-			<?php 
-			if(is_shop() && !empty($_GET['fwp_product_categories_search'])) {
-				echo 'Search Results';
-			}
-			else {
-				woocommerce_page_title();
-			}
-			?>
-		</h1>
-	<?php endif; ?>
+/**
+ * Hook: woocommerce_shop_loop_header.
+ *
+ * @since 8.6.0
+ *
+ * @hooked woocommerce_product_taxonomy_archive_header - 10
+ */
+do_action( 'woocommerce_shop_loop_header' );
 
-	<?php
-	/**
-	 * Hook: woocommerce_archive_description.
-	 *
-	 * @hooked woocommerce_taxonomy_archive_description - 10
-	 * @hooked woocommerce_product_archive_description - 10
-	 */
-	//do_action( 'woocommerce_archive_description' );
-	?>
-
-<div class="page-description">
-	<?php
-	/**
-	 * woocommerce_archive_description hook.
-	 *
-	 * @hooked woocommerce_taxonomy_archive_description - 10
-	 * @hooked woocommerce_product_archive_description - 10
-	 */
-
-	$description_top = true;
-
-	if (is_shop() || !empty($_GET['fwp_product_categories_search'])) {
-	    $description_top = false;
-	}
-
-	if( $description_top ) {
-	    do_action('woocommerce_archive_description');
-	}
-
-	?>
-</div>
-
-<?php
 if ( woocommerce_product_loop() ) {
 
 	/**
@@ -90,6 +53,11 @@ if ( woocommerce_product_loop() ) {
 	if ( wc_get_loop_prop( 'total' ) ) {
 		while ( have_posts() ) {
 			the_post();
+
+			/**
+			 * Hook: woocommerce_shop_loop.
+			 */
+			do_action( 'woocommerce_shop_loop' );
 
 			wc_get_template_part( 'content', 'product' );
 		}
@@ -109,12 +77,7 @@ if ( woocommerce_product_loop() ) {
 	 *
 	 * @hooked wc_no_products_found - 10
 	 */
-	//do_action( 'woocommerce_no_products_found' );
-	wc_get_template('loop/no-products-found.php');
-}
-
-if( !$description_top ) {
-	do_action('woocommerce_archive_description');
+	do_action( 'woocommerce_no_products_found' );
 }
 
 /**
@@ -129,6 +92,6 @@ do_action( 'woocommerce_after_main_content' );
  *
  * @hooked woocommerce_get_sidebar - 10
  */
-//do_action( 'woocommerce_sidebar' );
+do_action( 'woocommerce_sidebar' );
 
 get_footer( 'shop' );
